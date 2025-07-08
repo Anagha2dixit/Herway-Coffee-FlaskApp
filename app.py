@@ -55,15 +55,21 @@ def update_customer(customer_id):
     phone = request.form["phone"]
     address = request.form["address"]
 
-    conn = get_db_connection()
-    conn.execute("""
-        UPDATE customers
-        SET name = ?, email = ?, phone = ?, address = ?
-        WHERE customer_id = ?
-    """, (name, email, phone, address, customer_id))
-    conn.commit()
-    conn.close()
-    return redirect("/customers")
+    def get_db_connection():
+    db_path = 'database/herway.db'
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)  # Create folder if it doesn't exist
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def initialize_db():
+    if not os.path.exists('database/herway.db'):
+        conn = get_db_connection()
+        with open('schema.sql') as f:
+            conn.executescript(f.read())
+        conn.commit()
+        conn.close()
+
 
 # ❌ Delete customer
 @app.route("/delete_customer/<int:customer_id>", methods=["POST"])
@@ -77,6 +83,8 @@ def delete_customer(customer_id):
 import os
 
 if __name__ == "__main__":
+    initialize_db()  # <-- create DB if not exists
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
