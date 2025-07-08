@@ -1,45 +1,55 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Customer List</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>Customer List</h1>
-    
-    <h3>Add New Customer</h3>
-    <form action="/add_customer" method="POST">
-        <input name="name" placeholder="Name" required>
-        <input name="email" placeholder="Email" required>
-        <input name="phone" placeholder="Phone" required>
-        <input name="address" placeholder="Address" required>
-        <button type="submit">Add</button>
-    </form>
+    <h1>☕ Herway Coffee – Customer Management</h1>
 
-    <br><br>
+    <section class="form-section">
+        <h3>Add New Customer</h3>
+        <form action="/add_customer" method="POST">
+            <input name="name" placeholder="Name" required>
+            <input name="email" placeholder="Email" required>
+            <input name="phone" placeholder="Phone" required>
+            <input name="address" placeholder="Address" required>
+            <button type="submit">Add</button>
+        </form>
+    </section>
 
-    <table border="1">
-        <tr>
-            <th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Address</th><th>Loyalty Points</th><th>Delete</th><th>Edit</th>
-        </tr>
-        {% for customer in customers %}
-        <tr>
-            <td>{{ customer["customer_id"] }}</td>
-            <td>{{ customer["name"] }}</td>
-            <td>{{ customer["email"] }}</td>
-            <td>{{ customer["phone"] }}</td>
-            <td>{{ customer["address"] }}</td>
-            <td>{{ customer["loyalty_points"] }}</td>
-            <td>
-                <form action="/delete_customer/{{ customer['customer_id'] }}" method="POST" onsubmit="return confirm('Delete this customer?');">
-                    <button type="submit">Delete</button>
-                </form>
-            </td>
-            <td>
-                <a href="/edit_customer/{{ customer['customer_id'] }}">Edit</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+    <section class="table-section">
+        <h3>Customer List</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Address</th><th>Loyalty Points</th><th>Delete</th><th>Edit</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for customer in customers %}
+                <tr>
+                    <td>{{ customer["customer_id"] }}</td>
+                    <td>{{ customer["name"] }}</td>
+                    <td>{{ customer["email"] }}</td>
+                    <td>{{ customer["phone"] }}</td>
+                    <td>{{ customer["address"] }}</td>
+                    <td>{{ customer["loyalty_points"] }}</td>
+                    <td>
+                        <form action="/delete_customer/{{ customer['customer_id'] }}" method="POST" onsubmit="return confirm('Delete this customer?');">
+                            <button type="submit">Delete</button>
+                        </form>
+                    </td>
+                    <td>
+                        <a href="/edit_customer/{{ customer['customer_id'] }}">Edit</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
 </body>
 </html>
+
 
