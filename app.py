@@ -74,6 +74,12 @@ def delete_customer(customer_id):
     conn.close()
     return redirect("/customers")
 
-# 🏁 Start the app
-if __name__ == '__main__':
-    app.run(debug=True)
+# 🏁 Start the appif __name__ == "__main__":
+  import os
+
+iimport os
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
+
