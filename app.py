@@ -1,20 +1,32 @@
 from flask import Flask, render_template, request, redirect
 import sqlite3
+import os
 
 app = Flask(__name__)
 
-# 🔌 Function to connect to the database
+# 🔌 Connect to database
 def get_db_connection():
-    conn = sqlite3.connect('database/herway.db')
+    db_path = 'database/herway.db'
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+    conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
 
-# 🏠 Home route (redirects to customer list)
+# 🧱 Initialize DB from schema.sql if not exists
+def initialize_db():
+    if not os.path.exists('database/herway.db'):
+        conn = get_db_connection()
+        with open('schema.sql') as f:
+            conn.executescript(f.read())
+        conn.commit()
+        conn.close()
+
+# 🏠 Home route
 @app.route('/')
 def home():
     return redirect('/customers')
 
-# 📄 Display all customers
+# 📄 List customers
 @app.route('/customers')
 def customers():
     conn = get_db_connection()
@@ -22,7 +34,7 @@ def customers():
     conn.close()
     return render_template('customers.html', customers=customers)
 
-# ➕ Add new customer
+# ➕ Add customer
 @app.route('/add_customer', methods=['POST'])
 def add_customer():
     name = request.form['name']
@@ -39,7 +51,7 @@ def add_customer():
     conn.close()
     return redirect('/customers')
 
-# ✏️ Show edit form
+# ✏️ Edit form
 @app.route("/edit_customer/<int:customer_id>")
 def edit_customer(customer_id):
     conn = get_db_connection()
@@ -55,21 +67,15 @@ def update_customer(customer_id):
     phone = request.form["phone"]
     address = request.form["address"]
 
-    def get_db_connection():
-    db_path = 'database/herway.db'
-    os.makedirs(os.path.dirname(db_path), exist_ok=True)  # Create folder if it doesn't exist
-    conn = sqlite3.connect(db_path)
-    conn.row_factory = sqlite3.Row
-    return conn
-
-def initialize_db():
-    if not os.path.exists('database/herway.db'):
-        conn = get_db_connection()
-        with open('schema.sql') as f:
-            conn.executescript(f.read())
-        conn.commit()
-        conn.close()
-
+    conn = get_db_connection()
+    conn.execute("""
+        UPDATE customers
+        SET name = ?, email = ?, phone = ?, address = ?
+        WHERE customer_id = ?
+    """, (name, email, phone, address, customer_id))
+    conn.commit()
+    conn.close()
+    return redirect("/customers")
 
 # ❌ Delete customer
 @app.route("/delete_customer/<int:customer_id>", methods=["POST"])
@@ -80,10 +86,9 @@ def delete_customer(customer_id):
     conn.close()
     return redirect("/customers")
 
-import os
-
+# 🚀 Start Flask app on public IP for Render
 if __name__ == "__main__":
-    initialize_db()  # <-- create DB if not exists
+    initialize_db()
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
 
