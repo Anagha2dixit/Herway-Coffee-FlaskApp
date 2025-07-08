@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Customer</title>
+</head>
+<body>
+    <h1>Edit Customer</h1>
+    <form action="/update_customer/{{ customer['customer_id'] }}" method="POST">
+        <input name="name" value="{{ customer['name'] }}" required>
+        <input name="email" value="{{ customer['email'] }}" required>
+        <input name="phone" value="{{ customer['phone'] }}" required>
+        <input name="address" value="{{ customer['address'] }}" required>
+        <button type="submit">Update</button>
+    </form>
+</body>
+</html>
